@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/peerjs@1.0.0/dist/peerjs.min.js"></script>
+</head>
+
+<body>
+    <div id="app"></div>
+
+    <script>
+        const model = {
+            data: {},
+        };
+        var peer = new Peer();
+        peer.on('open', function (id) {
+            model.id = id;
+            updateView();
+         });
+        peer.on('connection', function (conn) {
+            conn.on('data', function (data) {
+                model.data[conn.peer] = data;
+                updateView();
+            });
+        });
+
+        function updateView() {
+            const url = location.href.replace('server.html',`?id=${model.id}`);
+            document.getElementById('app').innerHTML = `
+                Klient: <a href="${url}">${url}</a>
+                <table>
+                ${Object.keys(model.data).map(id=>`
+                    <tr>
+                        <td>${id}</td>
+                        <td>${model.data[id]}</td>
+                    </tr>
+                `).join('')}
+                </table>
+            `;
+        }
+
+    </script>
+</body>
+
+</html>

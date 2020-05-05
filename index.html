@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/peerjs@1.0.0/dist/peerjs.min.js"></script>
+</head>
+
+<body onload="init()">
+    <div id="app"></div>
+    <script>
+        const model = {
+            peer:  new Peer(),
+            answers: [],
+        };
+
+        function init() {
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const id = urlParams.get('id');
+            if (!id) {
+                updateView();
+                return;
+            }
+            model.id = id;
+            model.conn = model.peer.connect(id);
+            updateView();
+        }
+
+        function updateView() {
+            const app = document.getElementById('app');
+            if (!model.id) {
+                app.innerHTML = `<span style="color: red">Last siden på nytt med id som url-parameter. </span>`;
+                return;
+            }
+            const answersHtml = model.answers.length===0 ? '':`
+                <div>
+                    <b>Dine svar:</b>
+                    <ul>
+                        ${model.answers.map(txt=>`
+                        <li>${txt}</li>
+                        `).reverse().join('')}
+                    </ul>
+                </div>
+            `;
+            app.innerHTML = `
+                <input type="text" size="100" id="answerTxt"
+                    oninput="model.answer = this.value" 
+                    onkeyup="if(event.keyCode === 13) send()"
+                />
+                <button onclick="send()">Send</button>
+                ${answersHtml}
+            `;
+            document.getElementById("answerTxt").focus();
+        }
+
+        function send(){
+            model.conn.send(model.answer);
+            model.answers.push(model.answer);
+            model.answer = '';
+            updateView();
+        }
+    </script>
+</body>
+
+</html>
