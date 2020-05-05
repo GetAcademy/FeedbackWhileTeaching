@@ -7,11 +7,16 @@
     <title>Document</title>
     <script src="peer.min.js"></script>
     <style>
-        td.id{
+        td.id {
             color: lightgray;
         }
-        td.text{
+
+        td.text {
             font-size: 3vmin;
+        }
+
+        * {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
         }
     </style>
 </head>
@@ -39,7 +44,7 @@
 
         function updateView() {
             const lastSlashIndex = location.href.lastIndexOf('/');
-            const url = location.href.substr(0, lastSlashIndex+1) + `?id=${model.id}`;
+            const url = location.href.substr(0, lastSlashIndex + 1) + `?id=${model.id}`;
             document.getElementById('app').innerHTML = `
                 Klient: <a href="${url}">${url}</a>
                 <table>
