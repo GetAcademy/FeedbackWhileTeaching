@@ -23,6 +23,8 @@
         peer.on('connection', function (conn) {
             conn.on('data', function (data) {
                 model.data[conn.peer] = data;
+                console.log(data);
+                conn.send(data);
                 updateView();
             });
         });

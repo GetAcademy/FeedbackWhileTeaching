@@ -12,7 +12,7 @@
     <div id="app"></div>
     <script>
         const model = {
-            peer:  new Peer(),
+            peer: new Peer(),
             answers: [],
         };
 
@@ -26,6 +26,13 @@
             }
             model.id = id;
             model.conn = model.peer.connect(id);
+            model.conn.on('data', function (data) {
+                console.log(data);
+                const lastIndex = model.answers.length - 1;
+                const answerObj = model.answers[lastIndex];
+                if (answerObj.answer === data) answerObj.confirmed = true;
+                updateView();
+            });
             updateView();
         }
 
@@ -35,12 +42,12 @@
                 app.innerHTML = `<span style="color: red">Last siden på nytt med id som url-parameter. </span>`;
                 return;
             }
-            const answersHtml = model.answers.length===0 ? '':`
+            const answersHtml = model.answers.length === 0 ? '' : `
                 <div>
                     <b>Dine svar:</b>
                     <ul>
-                        ${model.answers.map(txt=>`
-                        <li>${txt}</li>
+                        ${model.answers.map(obj => `
+                        <li style="color: ${obj.confirmed ? 'green' : 'red'}">${obj.answer}</li>
                         `).reverse().join('')}
                     </ul>
                 </div>
@@ -56,9 +63,13 @@
             document.getElementById("answerTxt").focus();
         }
 
-        function send(){
+        function send() {
             model.conn.send(model.answer);
-            model.answers.push(model.answer);
+            model.answers.push(
+                {
+                    answer: model.answer,
+                    confirmed: false,
+                });
             model.answer = '';
             updateView();
         }
