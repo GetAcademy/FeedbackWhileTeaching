@@ -19,7 +19,7 @@
         peer.on('open', function (id) {
             model.id = id;
             updateView();
-         });
+        });
         peer.on('connection', function (conn) {
             conn.on('data', function (data) {
                 model.data[conn.peer] = data;
@@ -30,11 +30,12 @@
         });
 
         function updateView() {
-            const url = location.href.replace('server.html',`?id=${model.id}`);
+            const lastSlashIndex = location.href.lastIndexOf('/');
+            const url = location.href.substr(0, lastSlashIndex+1) + `?id=${model.id}`;
             document.getElementById('app').innerHTML = `
                 Klient: <a href="${url}">${url}</a>
                 <table>
-                ${Object.keys(model.data).map(id=>`
+                ${Object.keys(model.data).map(id => `
                     <tr>
                         <td>${id}</td>
                         <td>${model.data[id]}</td>
