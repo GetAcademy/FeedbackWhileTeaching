@@ -55,7 +55,15 @@
                     </tr>
                 `).join('')}
                 </table>
+                <button onclick="blank()">Blank</button>
             `;
+        }
+
+        function blank() {
+            for (let key in model.data) {
+                model.data[key] = '';
+            }
+            updateView();
         }
 
     </script>
