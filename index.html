@@ -17,6 +17,7 @@
     <div id="app"></div>
     <script>
         const model = {
+            status: '',
             peer: new Peer(),
             answers: [],
         };
@@ -31,8 +32,12 @@
             }
             model.id = id;
             model.conn = model.peer.connect(id);
+            model.status = `Kobler til ${id}...`;
+            model.conn.on('open', function () {
+                model.status = `Er koblet til ${id}.`;
+                updateView();
+            });
             model.conn.on('data', function (data) {
-                console.log(data);
                 const lastIndex = model.answers.length - 1;
                 const answerObj = model.answers[lastIndex];
                 if (answerObj.answer === data) answerObj.confirmed = true;
@@ -58,6 +63,7 @@
                 </div>
             `;
             app.innerHTML = `
+                <div class="info">${model.status}</div>
                 <input type="text" size="100" id="answerTxt"
                     oninput="model.answer = this.value" 
                     onkeyup="if(event.keyCode === 13) send()"
@@ -69,7 +75,13 @@
         }
 
         function send() {
-            model.conn.send(model.answer);
+            try {
+                model.conn.send(model.answer);
+            } catch (error) {
+                model.status = error;
+                updateView();
+                return;
+            }
             model.answers.push(
                 {
                     answer: model.answer,
