@@ -17,12 +17,12 @@
     <div id="app"></div>
     <script>
         const model = {
-            status: '',
-            peer: new Peer(),
+            status: '',            
             answers: [],
         };
 
         function init() {
+            model.peer = new Peer();
             const queryString = window.location.search;
             const urlParams = new URLSearchParams(queryString);
             const id = urlParams.get('id');
