@@ -21,26 +21,29 @@
     </style>
 </head>
 
-<body>
+<body onload="init()">
     <div id="app"></div>
 
     <script>
         const model = {
             data: {},
         };
-        var peer = new Peer();
-        peer.on('open', function (id) {
-            model.id = id;
-            updateView();
-        });
-        peer.on('connection', function (conn) {
-            conn.on('data', function (data) {
-                model.data[conn.peer] = data;
-                console.log(data);
-                conn.send(data);
+
+        function init() {
+            var peer = new Peer();
+            peer.on('open', function (id) {
+                model.id = id;
                 updateView();
             });
-        });
+            peer.on('connection', function (conn) {
+                conn.on('data', function (data) {
+                    model.data[conn.peer] = data;
+                    console.log(data);
+                    conn.send(data);
+                    updateView();
+                });
+            });
+        }
 
         function updateView() {
             const lastSlashIndex = location.href.lastIndexOf('/');
