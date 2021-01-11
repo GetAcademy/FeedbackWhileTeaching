@@ -32,9 +32,7 @@
         function init() {
             var peer = new Peer(null, {
                 host: 'feebackserver.herokuapp.com',
-                secure: false,
-                port: 80,
-
+                secure: true,
             });
             peer.on('open', function (id) {
                 model.id = id;

@@ -24,8 +24,7 @@
         function init() {
             model.peer = new Peer(null, {
                 host: 'feebackserver.herokuapp.com',
-                secure: false,
-                port: 80,
+                secure: true,
             });
             const queryString = window.location.search;
             const urlParams = new URLSearchParams(queryString);
