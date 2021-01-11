@@ -30,7 +30,12 @@
         };
 
         function init() {
-            var peer = new Peer('https://feebackserver.herokuapp.com/');
+            var peer = new Peer(null, {
+                host: 'feebackserver.herokuapp.com',
+                secure: false,
+                port: 80,
+
+            });
             peer.on('open', function (id) {
                 model.id = id;
                 updateView();
