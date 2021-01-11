@@ -22,10 +22,11 @@
         };
 
         function init() {
-            model.peer = new Peer(null, {
-                host: 'feebackserver.herokuapp.com',
-                secure: true,
-            });
+            model.peer = new Peer();
+            // model.peer = new Peer(null, {
+            //     host: 'feebackserver.herokuapp.com',
+            //     secure: true,
+            // });
             const queryString = window.location.search;
             const urlParams = new URLSearchParams(queryString);
             const id = urlParams.get('id');
