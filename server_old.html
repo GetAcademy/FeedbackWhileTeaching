@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
     <style>
         td.id {
             color: lightgray;
@@ -18,39 +19,39 @@
             font-family: Verdana, Geneva, Tahoma, sans-serif;
         }
     </style>
-    <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.21.7.min.js"></script>
 </head>
 
-<body>
+<body onload="init()">
     <div id="app"></div>
 
-    <script src="initPubNub.js"></script>
     <script>
-        pubnub.subscribe({
-            channels: ['feedback'],
-            withPresence: true
-        });
-
-        pubnub.addListener({
-            message: function (event) {
-                model.data[event.message.sender] = event.message.content;
-                updateView();
-            },
-            presence: function (event) {
-                model.data[event.uuid] = 'ble med';
-                console.log(event);
-                updateView();
-            }
-        });
-
         const model = {
             data: {},
         };
 
-        updateView();
+        function init() {
+            var peer = new Peer();
+            // var peer = new Peer(null, {
+            //     host: 'feebackserver.herokuapp.com',
+            //     secure: true,
+            // });
+            peer.on('open', function (id) {
+                model.id = id;
+                updateView();
+            });
+            peer.on('connection', function (conn) {
+                conn.on('data', function (data) {
+                    model.data[conn.peer] = data;
+                    console.log(data);
+                    conn.send(data);
+                    updateView();
+                });
+            });
+        }
+
         function updateView() {
             const lastSlashIndex = location.href.lastIndexOf('/');
-            const url = location.href.substr(0, lastSlashIndex + 1) + `?id=${uuid}`;
+            const url = location.href.substr(0, lastSlashIndex + 1) + `?id=${model.id}`;
             document.getElementById('app').innerHTML = `
                 Klient: <a href="${url}">${url}</a>
                 <table>

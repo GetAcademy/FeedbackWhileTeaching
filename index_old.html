@@ -5,30 +5,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.21.7.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
     <style>
         * {
             font-family: Verdana, Geneva, Tahoma, sans-serif;
-            font-size: xx-large;
         }
     </style>
 </head>
 
-<body>
+<body onload="init()">
     <div id="app"></div>
-    <script src="initPubNub.js"></script>
     <script>
         const model = {
             status: '',
             answers: [],
         };
 
-        const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
-        const id = urlParams.get('id');
-        if (id) model.id = id;
+        function init() {
+            model.peer = new Peer();
+            // model.peer = new Peer(null, {
+            //     host: 'feebackserver.herokuapp.com',
+            //     secure: true,
+            // });
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const id = urlParams.get('id');
+            if (!id) {
+                updateView();
+                return;
+            }
+            model.id = id;
+            model.conn = model.peer.connect(id);
+            model.status = `Kobler til ${id}...`;
+            model.conn.on('open', function () {
+                model.status = `Er koblet til ${id}.`;
+                updateView();
+            });
+            model.conn.on('data', function (data) {
+                const lastIndex = model.answers.length - 1;
+                const answerObj = model.answers[lastIndex];
+                if (answerObj.answer === data) answerObj.confirmed = true;
+                updateView();
+            });
+            updateView();
+        }
 
-        updateView();
         function updateView() {
             const app = document.getElementById('app');
             if (!model.id) {
@@ -40,12 +61,13 @@
                     <b>Dine svar:</b>
                     <ul>
                         ${model.answers.map(obj => `
-                        <li>${obj.answer}</li>
+                        <li style="color: ${obj.confirmed ? 'green' : 'red'}">${obj.answer}</li>
                         `).reverse().join('')}
                     </ul>
                 </div>
             `;
             app.innerHTML = `
+                <div class="info">${model.status}</div>
                 <input type="text" size="100" id="answerTxt"
                     oninput="model.answer = this.value" 
                     onkeyup="if(event.keyCode === 13) send()"
@@ -57,12 +79,13 @@
         }
 
         function send() {
-            pubnub.publish({
-                channel: "feedback",
-                message: { "sender": uuid, "content": model.answer }
-            }, function (status, response) {
-                model.status = response;
-            });
+            try {
+                model.conn.send(model.answer);
+            } catch (error) {
+                model.status = error;
+                updateView();
+                return;
+            }
             model.answers.push(
                 {
                     answer: model.answer,
