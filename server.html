@@ -33,24 +33,24 @@
 
         pubnub.addListener({
             message: function (event) {
-                const id = validateId(event);
+                const id = validateId(event.message.sender);
                 model.data[id] = event.message.content;
                 updateView();
             },
             presence: function (event) {
-                const id = validateId(event);
+                const id = validateId(event.uuid);
                 model.data[id] = 'ble med';
                 console.log(event);
                 updateView();
             }
         });
 
-        function validateId(event) {
-            if (!model.noFromId[event.uuid]) {
+        function validateId(uuid) {
+            if (!model.noFromId[uuid]) {
                 model.clientCount++;
-                model.noFromId[event.uuid] = model.clientCount;
+                model.noFromId[uuid] = model.clientCount;
             }
-            return model.noFromId[event.uuid];
+            return model.noFromId[uuid];
         }
 
         const model = {
