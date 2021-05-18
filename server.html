@@ -38,12 +38,16 @@
             },
             presence: function (event) {
                 model.data[event.uuid] = 'ble med';
+                model.clientCount++;
+                model.noFromId[event.uuid] = model.clientCount;
                 console.log(event);
                 updateView();
             }
         });
 
         const model = {
+            clientCount: 0,
+            noFromId: {},
             data: {},
         };
 
@@ -54,9 +58,9 @@
             document.getElementById('app').innerHTML = `
                 Klient: <a href="${url}">${url}</a>
                 <table>
-                ${Object.keys(model.data).sort().map(id => `
+                ${Object.keys(model.data).map(id => `
                     <tr>
-                        <td class="id">${id}</td>
+                        <td class="id">${model.noFromId[id]}</td>
                         <td class="text">${model.data[id]}</td>
                     </tr>
                 `).join('')}
