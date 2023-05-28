@@ -57,13 +57,13 @@
         }
 
         function send() {
+            const text = encodeHTMLEntities(model.answer);
             pubnub.publish({
                 channel: "feedback",
-                message: { "sender": uuid, "content": model.answer }
+                message: { "sender": uuid, "content": text }
             }, function (status, response) {
                 model.status = response;
             });
-            const text = encodeHTMLEntities(model.answer);
             model.answers.push(
                 {
                     answer: text,
