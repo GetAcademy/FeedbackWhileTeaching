@@ -63,13 +63,18 @@
             }, function (status, response) {
                 model.status = response;
             });
+            const text = encodeHTMLEntities(model.answer);
             model.answers.push(
                 {
-                    answer: model.answer,
+                    answer: text,
                     confirmed: false,
                 });
             model.answer = '';
             updateView();
+        }
+
+        function encodeHTMLEntities(rawStr) {
+            return rawStr.replace(/[\u00A0-\u9999<>\&]/g, ((i) => `&#${i.charCodeAt(0)};`));
         }
     </script>
 </body>
